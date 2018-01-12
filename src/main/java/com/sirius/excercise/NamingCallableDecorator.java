@@ -5,7 +5,7 @@ import java.util.concurrent.Callable;
 public class NamingCallableDecorator<T> implements Callable<T> {
     private final Callable<T> wrapped;
     
-    public NamingCallableDecorator(final Callable<T> wrapped) {
+    NamingCallableDecorator(final Callable<T> wrapped) {
         this.wrapped = wrapped;
     }
     

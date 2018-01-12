@@ -1,9 +1,9 @@
 package com.sirius.excercise;
 
-public class CatchingRunnableDecorator implements Runnable {
+class CatchingRunnableDecorator implements Runnable {
     private final Runnable wrapped;
     
-    public CatchingRunnableDecorator(final Runnable wrapped) {
+    CatchingRunnableDecorator(final Runnable wrapped) {
         this.wrapped = wrapped;
     }
     

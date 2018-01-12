@@ -2,10 +2,10 @@ package com.sirius.excercise;
 
 import java.util.concurrent.Callable;
 
-public class MeasuringCallableDecorator<T> implements Callable<T> {
+class MeasuringCallableDecorator<T> implements Callable<T> {
     private final Callable<T> wrapped;
     
-    public MeasuringCallableDecorator(final Callable<T> wrapped) {
+    MeasuringCallableDecorator(final Callable<T> wrapped) {
         this.wrapped = wrapped;
     }
     
@@ -16,7 +16,8 @@ public class MeasuringCallableDecorator<T> implements Callable<T> {
         try {
             result = wrapped.call();
         } finally {
-            System.out.println(System.currentTimeMillis() - start);
+            final long duration = System.currentTimeMillis() - start;
+            System.out.println(duration);
         }
         return result;
     }

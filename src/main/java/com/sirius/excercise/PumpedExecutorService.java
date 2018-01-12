@@ -1,6 +1,9 @@
 package com.sirius.excercise;
 
+import com.sirius.observer.Subscriber;
+
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -9,6 +12,12 @@ public class PumpedExecutorService implements ExecutorService {
     private final boolean useMeasurer;
     private final boolean useCatcher;
     private final boolean useNamer;
+    
+    private final Collection<Subscriber<String>> listeners = new HashSet<>();
+    
+    public void subscribe(Subscriber<String> listener) {
+        listeners.add(listener);
+    }
     
     private PumpedExecutorService(final boolean useMeasurer, final boolean useCatcher, final boolean useNamer) {
         this.useMeasurer = useMeasurer;
@@ -30,6 +39,9 @@ public class PumpedExecutorService implements ExecutorService {
     
     @Override
     public <T> Future<T> submit(final Callable<T> task) {
+        for (Subscriber<String> subscriber : listeners) {
+            subscriber.update("Submitted " + task.getClass().getName());
+        }
         final Callable<T> callable = CallableWrapperBuilder.of(task)
                 .catching(useCatcher)
                 .measuring(useMeasurer)
@@ -39,6 +51,9 @@ public class PumpedExecutorService implements ExecutorService {
     
     @Override
     public <T> Future<T> submit(final Runnable task, final T result) {
+        for (Subscriber<String> subscriber : listeners) {
+            subscriber.update("Submitted " + task.getClass().getName());
+        }
         final Runnable wrapped = RunnableWrapperBuilder.of(task)
                 .catching(useCatcher)
                 .measuring(useMeasurer)
@@ -48,6 +63,9 @@ public class PumpedExecutorService implements ExecutorService {
     
     @Override
     public Future<?> submit(final Runnable task) {
+        for (Subscriber<String> subscriber : listeners) {
+            subscriber.update("Submitted " + task.getClass().getName());
+        }
         final Runnable wrapped = RunnableWrapperBuilder.of(task)
                 .catching(useCatcher)
                 .measuring(useMeasurer)
@@ -57,6 +75,9 @@ public class PumpedExecutorService implements ExecutorService {
     
     @Override
     public void execute(final Runnable command) {
+        for (Subscriber<String> subscriber : listeners) {
+            subscriber.update("Submitted " + command.getClass().getName());
+        }
         final Runnable wrapped = RunnableWrapperBuilder.of(command)
                 .catching(useCatcher)
                 .measuring(useMeasurer)

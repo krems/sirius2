@@ -2,7 +2,7 @@ package com.sirius.excercise;
 
 import java.util.concurrent.Callable;
 
-public class CallableWrapperBuilder<T> {
+class CallableWrapperBuilder<T> {
     private final Callable<T> task;
     private boolean useMeasurer;
     private boolean useCatcher;

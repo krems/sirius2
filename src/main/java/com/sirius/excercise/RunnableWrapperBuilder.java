@@ -1,6 +1,6 @@
 package com.sirius.excercise;
 
-public class RunnableWrapperBuilder {
+class RunnableWrapperBuilder {
     private final Runnable task;
     private boolean useMeasurer;
     private boolean useCatcher;

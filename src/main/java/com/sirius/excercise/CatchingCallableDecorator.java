@@ -2,10 +2,10 @@ package com.sirius.excercise;
 
 import java.util.concurrent.Callable;
 
-public class CatchingCallableDecorator<T> implements Callable<T> {
+class CatchingCallableDecorator<T> implements Callable<T> {
     private final Callable<T> wrapped;
     
-    public CatchingCallableDecorator(final Callable<T> wrapped) {
+    CatchingCallableDecorator(final Callable<T> wrapped) {
         this.wrapped = wrapped;
     }
     
