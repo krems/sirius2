@@ -18,6 +18,7 @@ public class CommandDemo {
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
                 }
+                System.out.println(Thread.currentThread().getName());
                 long end = System.currentTimeMillis();
                 System.out.println(name + " in queue: " + (start - timeCreated));
                 System.out.println(name + " duration: " + (end - start));

@@ -62,6 +62,7 @@ public class PumpedExecutorServiceTest {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
             }
+            System.out.println(Thread.currentThread().getName());
             System.err.println(System.currentTimeMillis() - start);
         }
     }
