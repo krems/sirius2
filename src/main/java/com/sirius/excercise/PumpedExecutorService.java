@@ -9,22 +9,25 @@ public class PumpedExecutorService implements ExecutorService {
     
     @Override
     public <T> Future<T> submit(final Callable<T> task) {
-        return executor.submit(task);
+        return executor.submit(new CatchingCallableDecorator<>(new MeasuringCallableDecorator<>(new NamingCallableDecorator<>(task))));
     }
     
     @Override
     public <T> Future<T> submit(final Runnable task, final T result) {
-        return executor.submit(task, result);
+        final Runnable wrapped = new CatchingRunnableDecorator(new MeasuringRunnableDecorator(new NamingRunnableDecorator(task)));
+        return executor.submit(wrapped, result);
     }
     
     @Override
     public Future<?> submit(final Runnable task) {
-        return executor.submit(task);
+        final Runnable wrapped = new CatchingRunnableDecorator(new MeasuringRunnableDecorator(new NamingRunnableDecorator(task)));
+        return executor.submit(wrapped);
     }
     
     @Override
     public void execute(final Runnable command) {
-        executor.execute(command);
+        final Runnable wrapped = new CatchingRunnableDecorator(new MeasuringRunnableDecorator(new NamingRunnableDecorator(command)));
+        executor.execute(wrapped);
     }
     
     @Override
