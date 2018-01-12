@@ -10,7 +10,7 @@ public class PumpedExecutorServiceTest {
     
     @Test
     public void testSubmit_shouldExecuteTask() throws Exception {
-        PumpedExecutorService executor = null;
+        PumpedExecutorService executor = PumpedExecutorService.fullExecutorService();
         boolean[] done = new boolean[1];
         
         executor.submit(() -> {
@@ -24,7 +24,7 @@ public class PumpedExecutorServiceTest {
     
     @Test
     public void testSubmit_shouldMeasureExecutionTime() throws Exception {
-        PumpedExecutorService executor = null;
+        PumpedExecutorService executor = PumpedExecutorService.fullExecutorService();
         
         executor.submit(new MeasuringTask());
     
@@ -34,7 +34,7 @@ public class PumpedExecutorServiceTest {
     
     @Test
     public void testSubmit_shouldLogErrors() throws Exception {
-        PumpedExecutorService executor = null;
+        PumpedExecutorService executor = PumpedExecutorService.fullExecutorService();
         
         executor.submit(new ThrowingTask());
         
@@ -44,7 +44,7 @@ public class PumpedExecutorServiceTest {
     
     @Test
     public void testSubmit_shouldSetThreadNameToClassName() throws Exception {
-        PumpedExecutorService executor = null;
+        PumpedExecutorService executor = PumpedExecutorService.fullExecutorService();
     
         final MeasuringTask task = new MeasuringTask();
         executor.submit(task);
@@ -63,6 +63,7 @@ public class PumpedExecutorServiceTest {
             } catch (InterruptedException e) {
             }
             System.err.println(System.currentTimeMillis() - start);
+            System.err.println(Thread.currentThread().getName());
         }
     }
     

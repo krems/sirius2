@@ -1,33 +1,35 @@
 package com.sirius.excercise;
 
 public class RunnableWrapperBuilder {
-    private Runnable task;
+    private final Runnable task;
     private boolean useMeasurer;
     private boolean useCatcher;
     private boolean useNamer;
     
-    public RunnableWrapperBuilder task(Runnable task) {
+    private RunnableWrapperBuilder(final Runnable task) {
         this.task = task;
+    }
+    
+    public static RunnableWrapperBuilder of(final Runnable task) {
+        return new RunnableWrapperBuilder(task);
+    }
+    
+    public RunnableWrapperBuilder measuring(final boolean measuring) {
+        useMeasurer = measuring;
         return this;
     }
     
-    public RunnableWrapperBuilder measuring() {
-        useMeasurer = true;
+    public RunnableWrapperBuilder catching(final boolean catching) {
+        useCatcher = catching;
         return this;
     }
     
-    public RunnableWrapperBuilder catching() {
-        useCatcher = true;
-        return this;
-    }
-    
-    public RunnableWrapperBuilder naming() {
-        useNamer = true;
+    public RunnableWrapperBuilder naming(final boolean naming) {
+        useNamer = naming;
         return this;
     }
     
     public Runnable build() {
-        validate();
         Runnable wrapped = this.task;
         if (useNamer) {
             wrapped = new NamingRunnableDecorator(wrapped);
@@ -39,11 +41,5 @@ public class RunnableWrapperBuilder {
             wrapped = new CatchingRunnableDecorator(wrapped);
         }
         return wrapped;
-    }
-    
-    private void validate() {
-        if (task == null) {
-            throw new IllegalStateException("Missing task!");
-        }
     }
 }

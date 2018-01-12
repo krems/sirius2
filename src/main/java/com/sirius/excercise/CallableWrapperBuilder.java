@@ -3,33 +3,35 @@ package com.sirius.excercise;
 import java.util.concurrent.Callable;
 
 public class CallableWrapperBuilder<T> {
-    private Callable<T> task;
+    private final Callable<T> task;
     private boolean useMeasurer;
     private boolean useCatcher;
     private boolean useNamer;
     
-    public CallableWrapperBuilder<T> task(Callable<T> task) {
+    private CallableWrapperBuilder(final Callable<T> task) {
         this.task = task;
+    }
+    
+    public static <T> CallableWrapperBuilder of(final Callable<T> task) {
+        return new CallableWrapperBuilder<T>(task);
+    }
+    
+    public CallableWrapperBuilder measuring(final boolean measuring) {
+        useMeasurer = measuring;
         return this;
     }
     
-    public CallableWrapperBuilder measuring() {
-        useMeasurer = true;
+    public CallableWrapperBuilder catching(final boolean catching) {
+        useCatcher = catching;
         return this;
     }
     
-    public CallableWrapperBuilder catching() {
-        useCatcher = true;
-        return this;
-    }
-    
-    public CallableWrapperBuilder naming() {
-        useNamer = true;
+    public CallableWrapperBuilder naming(final boolean naming) {
+        useNamer = naming;
         return this;
     }
     
     public Callable<T> build() {
-        validate();
         Callable<T> wrapped = this.task;
         if (useNamer) {
             wrapped = new NamingCallableDecorator<>(wrapped);
@@ -41,11 +43,5 @@ public class CallableWrapperBuilder<T> {
             wrapped = new CatchingCallableDecorator<>(wrapped);
         }
         return wrapped;
-    }
-    
-    private void validate() {
-        if (task == null) {
-            throw new IllegalStateException("Missing task!");
-        }
     }
 }
