@@ -2,6 +2,7 @@ package com.sirius.excercise;
 
 import org.junit.Test;
 
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
@@ -10,13 +11,13 @@ public class PumpedExecutorServiceTest {
     
     @Test
     public void testSubmit_shouldExecuteTask() throws Exception {
-        PumpedExecutorService executor = null;
+        PumpedExecutorService executor = new PumpedExecutorService();
         boolean[] done = new boolean[1];
-        
-        executor.submit(() -> {
+    
+        final Future<?> future = executor.submit(() -> {
             done[0] = true;
         });
-        executor.awaitTermination(100, TimeUnit.MILLISECONDS);
+        future.get();
         executor.shutdownNow();
         
         assertTrue(done[0]);
@@ -24,9 +25,9 @@ public class PumpedExecutorServiceTest {
     
     @Test
     public void testSubmit_shouldMeasureExecutionTime() throws Exception {
-        PumpedExecutorService executor = null;
-        
-        executor.submit(new MeasuringTask());
+        PumpedExecutorService executor = new PumpedExecutorService();
+    
+        executor.submit(new MeasuringTask()).get();
     
         executor.awaitTermination(100, TimeUnit.MILLISECONDS);
         executor.shutdownNow();
@@ -34,7 +35,7 @@ public class PumpedExecutorServiceTest {
     
     @Test
     public void testSubmit_shouldLogErrors() throws Exception {
-        PumpedExecutorService executor = null;
+        PumpedExecutorService executor = new PumpedExecutorService();
         
         executor.submit(new ThrowingTask());
         

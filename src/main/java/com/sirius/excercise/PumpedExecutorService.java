@@ -5,24 +5,42 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class PumpedExecutorService implements ExecutorService {
-    @Override
-    public <T> Future<T> submit(final Callable<T> task) {
-        return null;
-    }
-    
-    @Override
-    public <T> Future<T> submit(final Runnable task, final T result) {
-        return null;
-    }
+    private final ExecutorService executorService =
+            Executors.newSingleThreadExecutor();
     
     @Override
     public Future<?> submit(final Runnable task) {
-        return null;
+        return executorService.submit(new TimeProfileRunnable(task));
     }
     
     @Override
     public void execute(final Runnable command) {
+        executorService.execute(new TimeProfileRunnable(command));
+    }
     
+    @Override
+    public <T> Future<T> submit(final Callable<T> task) {
+        return executorService.submit(task);
+    }
+    
+    @Override
+    public <T> Future<T> submit(final Runnable task, final T result) {
+        return executorService.submit(task, result);
+    }
+    
+    private static class TimeProfileRunnable implements Runnable {
+        private final Runnable runnable;
+        
+        TimeProfileRunnable(final Runnable runnable) {
+            this.runnable = runnable;
+        }
+        
+        @Override
+        public void run() {
+            final long startTime = System.currentTimeMillis();
+            runnable.run();
+            System.out.println(System.currentTimeMillis() - startTime);
+        }
     }
     
     @Override

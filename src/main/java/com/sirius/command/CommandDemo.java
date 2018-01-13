@@ -1,11 +1,9 @@
 package com.sirius.command;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class CommandDemo {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, ExecutionException {
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         final Runnable command = new Runnable() {
             private final long timeCreated = System.currentTimeMillis();
@@ -28,6 +26,13 @@ public class CommandDemo {
         Thread.sleep(20);
         executor.submit(command);
         
+        final Future<Integer> future = executor.submit(() -> {
+            return 2 + 2;
+        });
+        
+        final Integer integer = future.get();
+        System.out.println(integer);
+    
         executor.awaitTermination(100, TimeUnit.MILLISECONDS);
         executor.shutdownNow();
     }
