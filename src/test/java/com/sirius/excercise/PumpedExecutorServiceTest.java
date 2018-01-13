@@ -36,8 +36,8 @@ public class PumpedExecutorServiceTest {
     @Test
     public void testSubmit_shouldLogErrors() throws Exception {
         PumpedExecutorService executor = new PumpedExecutorService();
-        
-        executor.submit(new ThrowingTask());
+    
+        executor.submit(new ThrowingTask()).get();
         
         executor.awaitTermination(100, TimeUnit.MILLISECONDS);
         executor.shutdownNow();
@@ -48,7 +48,7 @@ public class PumpedExecutorServiceTest {
         PumpedExecutorService executor = null;
     
         final MeasuringTask task = new MeasuringTask();
-        executor.submit(task);
+        executor.submit(task).get();
         
         executor.awaitTermination(100, TimeUnit.MILLISECONDS);
         executor.shutdownNow();

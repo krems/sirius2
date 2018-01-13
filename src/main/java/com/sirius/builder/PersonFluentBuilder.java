@@ -10,6 +10,12 @@ public class PersonFluentBuilder {
     private Sex sex;
     private MaritalStatus maritalStatus;
     
+    private void validate() {
+        if (firstName == null || surname == null || dateOfBirth == null) {
+            throw new IllegalStateException();
+        }
+    }
+    
     Person build() {
         validate();
         return new Person(firstName, middleName, surname, dateOfBirth, sex, maritalStatus);
@@ -53,11 +59,5 @@ public class PersonFluentBuilder {
     PersonFluentBuilder single() {
         this.maritalStatus = MaritalStatus.Single;
         return this;
-    }
-    
-    private void validate() {
-        if (firstName == null || surname == null || dateOfBirth == null) {
-            throw new IllegalStateException();
-        }
     }
 }
