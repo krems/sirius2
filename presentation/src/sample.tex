@@ -1,0 +1,523 @@
+\documentclass[russian,aspectratio=169,14pt]{beamer}
+
+\usetheme{ShipilevRH}
+
+\title{Паттерны проектирования}
+\subtitle{Приемы написания поддерживаемого кода}
+\author{Валерий Алексеевич Овчинников}
+\institute{valery.ovchinnikov@phystech.edu}
+
+\begin{document}
+
+\maketitle
+
+\section{Мотивация}
+
+\begin{frame}
+	\frametitle{Зачем изучать паттерны?}
+	\begin{itemize}
+		\item Перенимать опыт
+		\pause
+		\item Читая чужой код, можно понять, как улучшить свой
+		\pause
+		\item Заранее узнать о подводных камнях
+		\pause
+		\item Не изобретать велосипед
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Чего мы хотим?}
+	\begin{center}
+	\includegraphics[height=0.75\textheight]{want.jpeg}
+	\end{center}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Чего мы хотим?}
+	\begin{itemize}
+		\item SOLID код
+		\item Понятный другим программистам код
+		\item Поддерживаемый код
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Как в этом помогают паттерны?}
+	\begin{itemize}
+		\item Соответствуют принципам SOLID, даже помогают писать SOLID код
+		\item Общеизвестны, а значит, понятны другим программистам
+		\item Были разработаны для сложных ситуаций (в плане поддержки кода)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Когда использовать паттерны?}
+	\textbf{Только тогда, когда это необходимо}
+	\begin{center}
+	\includegraphics[height=0.6\textheight]{ko.jpg}
+	\end{center}
+\end{frame}
+
+
+
+
+\section{Command. Команда}
+
+\begin{frame}
+    \begin{center}
+	\includegraphics[height=0.8\textheight]{command.jpg}
+	\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Что это?}
+	\begin{listjava}
+interface Command {
+    void execute();
+}
+class ShoutingCommand implements Command {
+    private final String text;
+    ShoutingCommand(String text) {
+        this.text = text;
+    }
+    @Override
+    public void execute() {
+        System.out.println(text.toUpperCase());
+    }
+}
+	\end{listjava}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Зачем это?}
+	\begin{itemize}
+		\item Позволяет задавать различное поведение через единый интерфейс
+		\pause
+		\item Хранит данные и действия над ними рядом
+		\pause
+		\item Разрывает связь между инициатором операции (знает когда и что) и ее исполнителем (знает как)
+		\pause
+		\item $^*$Является альтернативой call-back'ам (функциям обратного вызова)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Примеры использования}
+	\begin{itemize}
+		\item Executors Framework (Runnable/Callable)
+		\item Функторы в C++
+		\item Транзакции
+		\item В реактивном программировании
+	\end{itemize}
+\end{frame}
+
+
+
+
+\section{Decorator. Декоратор}
+
+\begin{frame}
+    \begin{center}
+	\includegraphics[height=0.8\textheight]{decorator.jpg}
+	\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Что это?}
+	\begin{listjava}
+interface Worker {
+    void work();
+}
+class GardenWorker implements Worker {
+    @Override
+    public void work() {
+        System.out.println("Cutting grass");
+    }
+}
+	\end{listjava}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Что это?}
+	\begin{listjava}
+class ProfilingWorkerDecorator implements Worker {
+    private final Worker worker;
+    ProfilingWorker(Worker worker) {
+        this.worker = worker;
+    }
+    @Override
+    public void work() {
+        long start = System.currentTimeMillis();
+        worker.work();
+        long duration = System.currentTimeMillis() - start;
+        System.out.println("Took " + duration + "ms");
+    }
+}
+	\end{listjava}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Зачем это?}
+	\begin{itemize}
+		\item Позволяет расширять функциональность классов не нарушая OCP, LSP
+		\pause
+		\item Спасает от комбинаторного взрыва
+		\pause
+		\item Удобен для профилирования (при этом сохраняет SRP)
+		\pause
+		\item $^*$Позволяет писать в стиле Aspect Oriented Programming
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Примеры использования}
+	\begin{itemize}
+		\item Input/Output Streams в Java
+		\item Добавление графических оформлений виджетам (темы)
+		\item Добавление отладочной информации, проверки прав
+		\item Proxy класс в Java
+		\item Встроенный механизм в язык Python (@)
+		\item AspectJ
+	\end{itemize}
+\end{frame}
+
+
+
+
+\section*{Весёлая задачка}
+
+\begin{frame}
+    \frametitle{(на самом деле нет)}
+    Прокаченный ExecutorService
+    \vfill
+    \begin{enumerate}
+    	\item Добавить возможность
+    	\begin{enumerate}
+    		\item Измерять время выполнения задачи
+    		\pause
+       		\item Ловить все ошибки задачи и выводить их на экран
+       		\pause
+    		\item Изменять имя потока на имя класса выполняемой задачи
+    	\end{enumerate}
+    	\pause
+    	\item Соответствовать принципам SOLID
+    	\pause
+    	\item Использовать паттерны Builder, Fabric (method) + Decorator
+    	\pause
+    	\item Конфигурировать (включать/выключать) новые функции
+    \end{enumerate}
+\end{frame}
+
+
+
+
+\section{Builder. Строитель}
+
+\begin{frame}
+    \begin{center}
+	\includegraphics[height=0.8\textheight]{builder.jpg}
+	\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Что это?}
+\begin{listjava}
+class Person {
+	final String firstName;
+	final String middleName;
+	final String surname;
+	final Date dateOfBirth;
+	Person(String firstName, String middleName, 
+	       String surname, Date dateOfBirth) {
+		this.firstName = firstName;
+		this.middleName = middleName;
+		this.surname = surname;
+		this.dateOfBirth = dateOfBirth;
+	}
+}
+\end{listjava}	
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Что это?}
+\begin{listjava}
+class PersonBuilder {
+    String firstName;
+    ...
+    Person build() {
+        check();
+        return new Person(firstName, middleName, ...);
+    }
+    
+    void withFirstName(String name) {
+        this.firstName = name;
+    }
+    ...
+}
+\end{listjava}	
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Что это?}
+\begin{listjava}
+PersonBuilder builder = new PersonBuilder();
+builder.withFirstName("Oleg");
+builder.withMiddleName("Olegovich");
+builder.withSurname("Olegov");
+builder.bornAt(dateOfBirth);
+Person oleg = builder.build();
+\end{listjava}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Зачем это?}
+	\begin{itemize}
+		\item Сделать код более читаемым, если в конструкторе много (однотипных) параметров
+		\pause
+		\item Если нужно создавать неизменяемый объект, но не все его параметры доступны сразу
+		\pause
+		\item Если нужно делать сложные проверки аргументов
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Примеры использования}
+	\begin{itemize}
+		\item StringBuilder
+		\item Различные парсеры и конструкторы JSON/XML
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Fluent interface}
+	Часто используется совместно с паттерном Строитель
+	\vfill
+\begin{listjava}
+Person oleg = builder.withFirstName("Oleg")
+					.withMiddleName("Olegovich")
+					.withSurname("Olegov")
+					.bornAt(dateOfBirth)
+					.build();
+\end{listjava}	
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Fluent interface}
+\begin{listjava}
+class PersonFluentBuilder {
+    String firstName;
+    ...
+    Person build() {
+        check();
+        return new Person(firstName, middleName, ...);
+    }
+    
+    PersonFluentBuilder withFirstName(String name) {
+        this.firstName = name;
+        return this;
+    }
+    ...
+}
+\end{listjava}	
+\end{frame}
+
+
+
+
+\section{Factory. Фабрика}
+
+\begin{frame}
+    \begin{center}
+	\includegraphics[height=0.8\textheight]{fabric.jpg}
+	\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Что это?}
+	Фабрика
+	\begin{listjava}
+class ElephantFactory {
+    static Elephant pinkElephant() {
+        return new Elephant("#FFC0CB");
+    }
+    
+    static Elephant africanElephant() {
+        return new Elephant(ElephantType.African, "#D3D3D3", 
+            getPhysicalParams(ElephantType.African));
+    }
+}
+	\end{listjava}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Что это?}
+	Фабричный метод
+	\begin{listjava}
+public static LocalDate now();
+public static LocalDate ofEpochDay(long epochDay);
+public static LocalDate ofYearDay(int year, int dayOfYear);
+public static LocalDate parse(CharSequence text);
+	\end{listjava}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Зачем это?}
+	\begin{itemize}
+		\item Сделать код более читаемым, если существует несколько разных конструкторов
+		\pause
+		\item Скрывает реализации, оставляя открытым только интерфейс
+		\pause
+		\item Позволяет компоновать семейства из совместимых объектов
+		\pause
+		\item $^*$Один из способов организовать Inversion of Control
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Примеры использования}
+	\begin{itemize}
+		\item Executors Framework
+		\item LocalDate
+		\item Spring ServiceLocator
+	\end{itemize}
+\end{frame}
+
+
+
+
+\section{Observer. Наблюдатель}
+
+\begin{frame}
+    \begin{center}
+	\includegraphics[height=0.8\textheight]{observer.jpg}
+	\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Что это?}
+	\begin{listjava}
+interface Observer<T> {
+    void update(T observed);
+}
+class Publisher {
+    Collection<Observer<Publisher>> observers;
+    void subscribe(Observer<Publisher> observer) {
+        observers.add(observer);
+    }
+    void publish() {
+        for (Observer<Publisher> observer : observers) {
+            observer.update(this);
+        }
+    }
+}
+	\end{listjava}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Зачем это?}
+	\begin{itemize}
+		\item Позволяет оповещать заинтересованные объекты о событиях
+		\pause
+		\item Механизм обеспечивается через единый интерфейс, избегается жесткая связанность
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Примеры использования}
+	\begin{itemize}
+		\item В подходе к проектированию Model-View-Controller
+		\item В различных обработчиках событий (например, Button.onClick)
+		\item В реализации паттерна-подхода Proactor
+	\end{itemize}
+\end{frame}
+
+
+
+
+\section*{Весёлая задачка}
+
+\begin{frame}
+    \frametitle{(на самом деле нет)}
+    Прокаченный ExecutorService
+    \vfill
+    \begin{enumerate}
+    	\item Добавить возможность
+    	\begin{enumerate}
+    		\item Измерять время выполнения задачи
+    		\item Ловить все ошибки задачи и выводить их на экран
+    		\item Изменять имя потока на имя класса выполняемой задачи
+    		\item \textbf{Подписываться на отправку задач в Executor}
+    	\end{enumerate}
+    	\item Соответствовать принципам SOLID
+    	\item Использовать паттерны Builder, Fabric (method) + Decorator
+    	\item Конфигурировать (включать/выключать) новые функции
+    \end{enumerate}
+\end{frame}
+
+
+
+
+\section{Singleton. Уникум/Одиночка. Антипаттерн$^*$}
+
+\begin{frame}
+    \begin{center}
+	\includegraphics[height=0.8\textheight]{singleton.jpeg}
+	\end{center}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Что это?}
+	Объект класса Singleton существует в единственном экземпляре
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Что это?}
+	\begin{listjava}
+class Singleton {
+    public static final Singleton INSTANCE = new Singleton();
+    
+    private Singleton() {}
+}
+	\end{listjava}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Что это?}
+	\begin{listjava}
+class Singleton {
+    private static Singleton instance;
+    
+    private Singleton() {}
+    
+    public static Singleton instance() {
+        if (instance == null) {
+            instance = new Singleton();
+        }
+        return instance;
+    }
+}
+	\end{listjava}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Зачем это?}
+	\begin{itemize}
+		\item Не дает по ошибке создать несколько инстансов объекта, который всегда должен быть уникальным
+		\pause
+		\item Часто реализован неправильно, еще чаще не к месту
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Примеры использования}
+	\begin{itemize}
+		\item Объект, представляющий фаловую систему
+		\item Редко -- объект, представляющие соединение с базой
+	\end{itemize}
+\end{frame}
+
+
+\questions
+
+\end{document}
