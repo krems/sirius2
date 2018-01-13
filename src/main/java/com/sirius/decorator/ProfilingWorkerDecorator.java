@@ -1,9 +1,9 @@
 package com.sirius.decorator;
 
-public class ProfilingWorker implements Worker {
+public class ProfilingWorkerDecorator implements Worker {
     private final Worker worker;
     
-    ProfilingWorker(Worker worker) {
+    ProfilingWorkerDecorator(Worker worker) {
         this.worker = worker;
     }
     

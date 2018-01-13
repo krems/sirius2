@@ -10,12 +10,12 @@ public class PumpedExecutorService implements ExecutorService {
     
     @Override
     public Future<?> submit(final Runnable task) {
-        return executorService.submit(new TimeProfileRunnable(task));
+        return executorService.submit(task);
     }
     
     @Override
     public void execute(final Runnable command) {
-        executorService.execute(new TimeProfileRunnable(command));
+        executorService.execute(command);
     }
     
     @Override
@@ -26,21 +26,6 @@ public class PumpedExecutorService implements ExecutorService {
     @Override
     public <T> Future<T> submit(final Runnable task, final T result) {
         return executorService.submit(task, result);
-    }
-    
-    private static class TimeProfileRunnable implements Runnable {
-        private final Runnable runnable;
-        
-        TimeProfileRunnable(final Runnable runnable) {
-            this.runnable = runnable;
-        }
-        
-        @Override
-        public void run() {
-            final long startTime = System.currentTimeMillis();
-            runnable.run();
-            System.out.println(System.currentTimeMillis() - startTime);
-        }
     }
     
     @Override
